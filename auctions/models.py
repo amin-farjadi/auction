@@ -3,15 +3,16 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import DateTimeField
 from datetime import datetime
-
+import os
 
 class User(AbstractUser):
     # watchlist
     pass
 
+
 class Listing(models.Model):
     # picture
-    pic = models.ImageField()
+    pic = models.ImageField(upload_to = 'images')
     # name
     name = models.CharField(max_length=100)
     # price

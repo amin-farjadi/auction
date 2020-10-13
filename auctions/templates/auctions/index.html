@@ -5,7 +5,7 @@
 
     {% for listing in listings %}
         <div>
-            
+            <img src= "{{listing.pic.url}}" alt="" style="max-height:300px">
             {{listing.id}}: {{ listing.name }}, {{ listing.price }}
         </div>
     
