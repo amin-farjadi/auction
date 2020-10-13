@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import request
+from django.shortcuts import redirect, render
 from django.urls import reverse
-
 from .models import User, Listing
+from django import forms
 
 
 def index(request):
@@ -63,3 +64,39 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+# Form for creating a listing
+class CreateListing(forms.ModelForm):
+    """Form for Listing model
+    Args:
+        
+    """
+    class Meta:
+        model = Listing
+        fields = ['title', 'price', 'description', 'image']
+
+
+def create_listing(request):
+    # create listing and redirect to index
+    if request.method == "POST" and request.user.is_authenticated:
+        form = CreateListing(request.POST, request.FILES)
+        if form.is_valid:
+            form.save()
+            return render(request, "auctions/create_listing.html",{
+                'form': form,
+                'submitted': True
+            })
+
+    # present form to be filled in
+    elif (request.method == "GET" and request.user.is_authenticated):
+        form = CreateListing()
+        return render(request, "auctions/create_listing.html",{
+            'form': form,
+            'submitted': False
+        })
+    
+    else:
+        return render(request, "auctions/login.html",{
+            "message": "You must be logged in to create a listing."
+        })
+    

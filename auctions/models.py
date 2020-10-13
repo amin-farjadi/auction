@@ -4,6 +4,7 @@ from django.db.models.deletion import CASCADE
 from django.db.models.fields import DateTimeField
 from datetime import datetime
 import os
+from django.conf import settings
 
 class User(AbstractUser):
     # watchlist
@@ -12,16 +13,22 @@ class User(AbstractUser):
 
 class Listing(models.Model):
     # picture
-    pic = models.ImageField(upload_to = 'images')
-    # name
-    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to = 'images',
+        #default=os.path.join(settings.MEDIA_ROOT, 'images/default.jpg'),
+        blank=True,
+        null=True
+    )
+    # title
+    title = models.CharField(max_length=100)
     # price
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    # description
+    description = models.CharField(max_length=3000, blank=True)
     # date and time created
     date_time = DateTimeField(auto_now_add=True)
-    # object name
+    # object title
     def __str__(self):
-        return f"{self.id}: {self.name}"
+        return f"{self.id}: {self.title}"
     #---join with other tables---#
     # watchlist
     # bid

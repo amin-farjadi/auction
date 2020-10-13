@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {% if submitted %}
+        <h2>Successfully publised.</h2>  
+
+    {% else %}
+        <form action="{% url 'create_listing' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+                <button type="submit">Publish</button>
+        </form>
+    {% endif %}  
+{% endblock %}
