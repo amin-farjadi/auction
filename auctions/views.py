@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.forms import widgets
+from django.forms.widgets import HiddenInput
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import request
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import User, Listing
+from .models import Comment, User, Listing
 from django import forms
 
 
@@ -99,4 +101,63 @@ def create_listing(request):
         return render(request, "auctions/login.html",{
             "message": "You must be logged in to create a listing."
         })
+
+
+# Form for adding comment
+class AddComment(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+
+
+
+def listing(request,listing_id):
+    ## get listing information
+    # when listing with that id exists 
+    try:
+        listing = Listing.objects.get(id=listing_id)
+
+        ## if comment is being added
+        if request.method == "POST":
+            form_comment = AddComment(request.POST)
+            form_comment = form_comment.save(commit=False)
+            form_comment.listing = listing
+            if True:
+                form_comment.save()
+                # get bid info
+                bids = listing.bids.all()
+                # get comments
+                comments = listing.comments.all()
+                # add comment form
+                form_comment = AddComment()
+                # pass on to listing.html
+                return render(request, "auctions/listing.html",{
+                    "listing": listing,
+                    "bids": bids,
+                    "comments": comments,
+                    "form": form_comment,
+
+                   })
+
+
+        ## if no comment is being added
+
+        # get bid info
+        bids = listing.bids.all()
+        # get comments
+        comments = listing.comments.all()
+        # add comment form
+        form_comment = AddComment()
+        # pass on to listing.html
+        return render(request, "auctions/listing.html",{
+            "listing": listing,
+            "bids": bids,
+            "comments": comments,
+            "form": form_comment,
+        })
     
+    # when listing does not exist
+    except Listing.DoesNotExist:
+        return render(request, "auctions/listing.html",{
+            "listing": None,
+        })

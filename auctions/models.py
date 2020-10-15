@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.deletion import CASCADE
-from django.db.models.fields import DateTimeField
+from django.db.models.fields import CharField, DateTimeField
 from datetime import datetime
 import os
 from django.conf import settings
@@ -23,7 +23,7 @@ class Listing(models.Model):
     # price
     price = models.DecimalField(max_digits=10, decimal_places=2)
     # description
-    description = models.CharField(max_length=3000, blank=True)
+    description = models.CharField(max_length=3000, blank=True, null=True)
     # date and time created
     date_time = DateTimeField(auto_now_add=True)
     # object title
@@ -45,4 +45,10 @@ class Bid(models.Model):
 
 
 class Comment(models.Model):
-    pass
+    # relationship to Listing
+    listing = models.ForeignKey(Listing, on_delete=CASCADE, related_name="comments")
+    # comment 
+    comment = CharField(max_length=500)
+    # object name
+    def __str__(self) -> str:
+        return f"{self.id}: comment on {self.listing}"
