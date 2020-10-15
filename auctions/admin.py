@@ -5,6 +5,7 @@ from .models import User, Listing, Bid, Comment
 class BidAdmin(admin.ModelAdmin):
     list_display = ("id", "bid", "listing")
 
+
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Listing)

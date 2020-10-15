@@ -6,6 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import request
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from .models import Bid, Comment, User, Listing
 from django import forms
 
@@ -77,7 +78,7 @@ class CreateListing(forms.ModelForm):
         model = Listing
         fields = ['title', 'price', 'description', 'image']
 
-
+#@login_required(login_url="/login")
 def create_listing(request):
     # create listing and redirect to index
     if request.method == "POST" and request.user.is_authenticated:
@@ -140,12 +141,32 @@ def listing(request,listing_id):
                 form_bid.save()
             return AddBid()
 
+        def wishlist_form(request, listing):
+            """ form for adding interested user to listing (for an authenticated user) """
+
+            if request.method=="POST" and request.POST.__contains__("add_wishlist"):
+                listing.interested_users.add(request.user)
+                return "Remove from wishlist", "rm_wishlist"
+    
+            elif request.method=="POST" and request.POST.__contains__("rm_wishlist"):
+                listing.interested_users.remove(request.user)
+                return "Add to wishlist", "add_wishlist"
+
+            else:
+                if not listing.interested_users.filter(username = request.user.username):
+                    return "Add to wishlist", "add_wishlist"
+                else:
+                    return "Remove from wishlist", "rm_wishlist"
+
+
         context = {
             'listing': listing,
             'bids': listing.bids.all(),
             'comments': listing.comments.all(),
             'comment_form': comment_form(request, listing),
             'bid_form': bid_form(request, listing),
+            'wishlist_form_name': wishlist_form(request, listing)[1],
+            'wishlist_form_text': wishlist_form(request, listing)[0],
         }
 
         # when form is not used

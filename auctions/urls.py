@@ -1,4 +1,3 @@
-from auctions.views import create_listing
 from django.urls import path
 from . import views
 

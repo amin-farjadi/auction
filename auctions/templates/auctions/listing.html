@@ -3,6 +3,15 @@
 {% block body%}
 {% if listing %}
 <div>
+    {% if user.is_authenticated %}
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" name= {{ wishlist_form_name }} value="wishlist">{{ wishlist_form_text }}</button>
+        </form>        
+    {% endif %}
+</div>
+
+<div>
     {% if listing.image %} 
         <img src= "{{listing.image.url}}" alt="{{listing.title}}" style="max-height:300px; max-width: 300px;">
     {% else %}

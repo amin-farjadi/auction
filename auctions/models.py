@@ -10,7 +10,6 @@ class User(AbstractUser):
     # watchlist
     pass
 
-
 class Listing(models.Model):
     # picture
     image = models.ImageField(upload_to = 'images',
@@ -33,6 +32,9 @@ class Listing(models.Model):
     # watchlist
     # bid
     # commment
+    # user
+    interested_users = models.ManyToManyField(User, blank=True, related_name="watchlists")
+
 
 class Bid(models.Model):
     # relationship to Listing
@@ -48,7 +50,7 @@ class Comment(models.Model):
     # relationship to Listing
     listing = models.ForeignKey(Listing, on_delete=CASCADE, related_name="comments")
     # comment 
-    comment = CharField(max_length=500)
+    comment = CharField(max_length=500, null=True)
     # object name
     def __str__(self) -> str:
         return f"{self.id}: comment on {self.listing}"

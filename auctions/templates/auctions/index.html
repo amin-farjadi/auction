@@ -11,7 +11,7 @@
             {% else %}
                 <img src= "/media/images/default.jpg" alt="Default Image" style="max-height:300px; max-width: 300px;">
             {% endif %}
-            {{listing.id}}: {{ listing.title }}, {{ listing.price }}
+           <a href="{% url 'listing' listing.id %}">{{listing.id}}: {{ listing.title }}, {{ listing.price }}</a>
         </div>
     
         {% empty %}
