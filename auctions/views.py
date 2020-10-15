@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.http import request
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from .models import Comment, User, Listing
+from .models import Bid, Comment, User, Listing
 from django import forms
 
 
@@ -109,6 +109,11 @@ class AddComment(forms.ModelForm):
         model = Comment
         fields = ['comment']
 
+# Form for adding bid
+class AddBid(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ['bid']
 
 
 def listing(request,listing_id):
@@ -117,44 +122,38 @@ def listing(request,listing_id):
     try:
         listing = Listing.objects.get(id=listing_id)
 
-        ## if comment is being added
-        if request.method == "POST":
-            form_comment = AddComment(request.POST)
-            form_comment = form_comment.save(commit=False)
-            form_comment.listing = listing
-            if True:
-                form_comment.save()
-                # get bid info
-                bids = listing.bids.all()
-                # get comments
-                comments = listing.comments.all()
-                # add comment form
-                form_comment = AddComment()
-                # pass on to listing.html
-                return render(request, "auctions/listing.html",{
-                    "listing": listing,
-                    "bids": bids,
-                    "comments": comments,
-                    "form": form_comment,
+        def comment_form(request,listing):
+            """ form for adding comments to a listing """
+            if request.method=="POST" and request.POST.__contains__("add_comment"):
+                form_comment = AddComment(request.POST)
+                form_comment = form_comment.save(commit=False)
+                form_comment.listing = listing
+                form_comment.save()  
+            return AddComment()
 
-                   })
+        def bid_form(request,listing):
+            """ form for adding bids to a listing"""
+            if request.method=="POST" and request.POST.__contains__("add_bid"):
+                form_bid = AddBid(request.POST)
+                form_bid = form_bid.save(commit=False)
+                form_bid.listing=listing
+                form_bid.save()
+            return AddBid()
 
+        context = {
+            'listing': listing,
+            'bids': listing.bids.all(),
+            'comments': listing.comments.all(),
+            'comment_form': comment_form(request, listing),
+            'bid_form': bid_form(request, listing),
+        }
 
-        ## if no comment is being added
+        # when form is not used
+        if not request.method=="POST":
+            return render(request, "auctions/listing.html", context)
 
-        # get bid info
-        bids = listing.bids.all()
-        # get comments
-        comments = listing.comments.all()
-        # add comment form
-        form_comment = AddComment()
-        # pass on to listing.html
-        return render(request, "auctions/listing.html",{
-            "listing": listing,
-            "bids": bids,
-            "comments": comments,
-            "form": form_comment,
-        })
+        return HttpResponseRedirect(reverse('listing', kwargs={'listing_id': listing_id}))
+
     
     # when listing does not exist
     except Listing.DoesNotExist:

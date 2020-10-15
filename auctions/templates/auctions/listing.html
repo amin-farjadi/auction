@@ -21,6 +21,13 @@
     </ul>
 </div>
 <div>
+    <form action="{% url 'listing' listing.id %}" method="POST">
+        {% csrf_token %}
+        {{bid_form}}
+        <button type="submit" name="add_bid" value="bid">Add</button>
+    </form>
+</div>
+<div>
     Comments:
     <ul>
         {% for comment in comments %}
@@ -33,8 +40,8 @@
 <div>
     <form action="{% url 'listing' listing.id %}" method="POST">
         {% csrf_token %}
-        {{form}}
-        <button type="submit">Add</button>
+        {{comment_form}}
+        <button type="submit" name="add_comment" value="comment">Add</button>
     </form>
 </div>
 {% else %}
