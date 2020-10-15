@@ -11,6 +11,20 @@
     {% endif %}
 </div>
 
+{% if user.id == listing.created_by.id and not listing.closed %}
+    <div>
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" name="close_listing" value="">Close listing</button>
+        </form>
+    </div>
+    {% elif listing.closed %}
+    <div>    
+        <h4>Listing is closed</h4>
+    </div>
+{% endif %}
+
+
 <div>
     {% if listing.image %} 
         <img src= "{{listing.image.url}}" alt="{{listing.title}}" style="max-height:300px; max-width: 300px;">
@@ -30,11 +44,15 @@
     </ul>
 </div>
 <div>
-    <form action="{% url 'listing' listing.id %}" method="POST">
-        {% csrf_token %}
-        {{bid_form}}
-        <button type="submit" name="add_bid" value="bid">Add</button>
-    </form>
+    {% if not bid_form == None and user.is_authenticated %}
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            {{bid_form}}
+            <button type="submit" name="add_bid" value="bid">Add</button>
+        </form>
+    {% elif bid_form == None %}
+        <h3>Auction is closed on this listing.</h3>
+    {% endif %}
 </div>
 <div>
     Comments:
@@ -46,6 +64,8 @@
         {% endfor %}
     </ul>
 </div>
+
+{% if user.is_authenticated %}
 <div>
     <form action="{% url 'listing' listing.id %}" method="POST">
         {% csrf_token %}
@@ -53,6 +73,8 @@
         <button type="submit" name="add_comment" value="comment">Add</button>
     </form>
 </div>
+{% endif %}
+
 {% else %}
     <h3>No listing with that ID.</h3>
 

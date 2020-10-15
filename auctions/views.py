@@ -7,7 +7,7 @@ from django.http import request
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from .models import Bid, Comment, User, Listing
+from .models import Bid, Comment, User, Listing, Category
 from django import forms
 
 
@@ -78,17 +78,19 @@ class CreateListing(forms.ModelForm):
         model = Listing
         fields = ['title', 'price', 'description', 'image']
 
+
 #@login_required(login_url="/login")
 def create_listing(request):
     # create listing and redirect to index
     if request.method == "POST" and request.user.is_authenticated:
         form = CreateListing(request.POST, request.FILES)
-        if form.is_valid:
-            form.save()
-            return render(request, "auctions/create_listing.html",{
-                'form': form,
-                'submitted': True
-            })
+        form = form.save(commit=False)
+        form.created_by = request.user
+        form.save()
+        return render(request, "auctions/create_listing.html",{
+            'form': form,
+            'submitted': True
+        })
 
     # present form to be filled in
     elif (request.method == "GET" and request.user.is_authenticated):
@@ -146,10 +148,12 @@ def listing(request,listing_id):
 
             if request.method=="POST" and request.POST.__contains__("add_wishlist"):
                 listing.interested_users.add(request.user)
+                listing.save()
                 return "Remove from wishlist", "rm_wishlist"
     
             elif request.method=="POST" and request.POST.__contains__("rm_wishlist"):
                 listing.interested_users.remove(request.user)
+                listing.save()
                 return "Add to wishlist", "add_wishlist"
 
             else:
@@ -167,9 +171,19 @@ def listing(request,listing_id):
             'bid_form': bid_form(request, listing),
             'wishlist_form_name': wishlist_form(request, listing)[1],
             'wishlist_form_text': wishlist_form(request, listing)[0],
+            'listing_closed': listing.closed
         }
 
-        # when form is not used
+        # closing listing
+        if request.method=="POST" and request.POST.__contains__("close_listing"):
+            listing.closed = True
+            listing.save()
+
+        if listing.closed:
+            context['bid_form'] = None
+    
+
+        # when nothing is posted
         if not request.method=="POST":
             return render(request, "auctions/listing.html", context)
 

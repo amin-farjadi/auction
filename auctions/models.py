@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.deletion import CASCADE
@@ -25,6 +26,10 @@ class Listing(models.Model):
     description = models.CharField(max_length=3000, blank=True, null=True)
     # date and time created
     date_time = DateTimeField(auto_now_add=True)
+    # user who created the listing
+    created_by = models.ForeignKey(User, on_delete=CASCADE, related_name="listings")
+    # listing closed parameter
+    closed = models.BooleanField(default=False)
     # object title
     def __str__(self):
         return f"{self.id}: {self.title}"
@@ -54,3 +59,10 @@ class Comment(models.Model):
     # object name
     def __str__(self) -> str:
         return f"{self.id}: comment on {self.listing}"
+
+
+CATEGORY_CHOICES = [('Electronics','Electronics'), ('Art','Art'), ('Others','Others')]
+
+class Category(models.Model):
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    listing = models.ManyToManyField(Listing, blank=True, related_name="categories")
