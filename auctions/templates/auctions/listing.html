@@ -43,17 +43,22 @@
         {% endfor %}
     </ul>
 </div>
+
+{% if not listing.closed and user.is_authenticated %}
 <div>
-    {% if not bid_form == None and user.is_authenticated %}
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             {{bid_form}}
             <button type="submit" name="add_bid" value="bid">Add</button>
         </form>
-    {% elif bid_form == None %}
-        <h3>Auction is closed on this listing.</h3>
-    {% endif %}
 </div>
+{% endif %}
+{% if listing.closed %}
+    <h3>Auction is closed on this listing.</h3>
+    {% if not auction_winner is None and user.id == auction_winner.id %}
+        <h3>You won the auction</h3>
+    {% endif %}
+{% endif %}
 <div>
     Comments:
     <ul>
