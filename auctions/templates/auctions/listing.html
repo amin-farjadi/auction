@@ -46,13 +46,20 @@
 
 {% if not listing.closed and user.is_authenticated %}
 <div>
-        <form action="{% url 'listing' listing.id %}" method="POST">
-            {% csrf_token %}
-            {{bid_form}}
-            <button type="submit" name="add_bid" value="bid">Add</button>
-        </form>
+    {% if bid_error is not none %}   
+        {{ bid_error }}
+    {% endif %}
+    <form action="{% url 'listing' listing.id %}" method="POST">
+        {% csrf_token %}
+
+        {{bid_form.as_p}}
+
+        <!-- {% endif %} -->
+        <button type="submit" name="add_bid" value="bid">Add</button>
+    </form>
 </div>
 {% endif %}
+
 {% if listing.closed %}
     <h3>Auction is closed on this listing.</h3>
     {% if not auction_winner is None and user.id == auction_winner.id %}
@@ -78,7 +85,6 @@
         <button type="submit" name="add_comment" value="comment">Add</button>
     </form>
 </div>
-{% endif %}
 
 {% else %}
     <h3>No listing with that ID.</h3>

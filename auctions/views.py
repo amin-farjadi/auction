@@ -9,10 +9,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import *
+from django.contrib import messages
 
 def index(request):
     return render(request, "auctions/index.html",{
-        "listings": Listing.objects.all(),
+        "listings": Listing.objects.filter(closed=False),
     })
 
 
@@ -38,7 +39,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return redirect(reverse("index"))
 
 
 def register(request):
@@ -81,18 +82,7 @@ def create_listing(request):
                 'form': form,
                 'submitted': True
             })
-        # form = CreateListing(request.POST, request.FILES, user_id=request.user.pk)
-        # if form.is_valid():
-        #     form.save()
-        #     return render(request, "auctions/create_listing.html",{
-        #         'form': form,
-        #         'submitted': True
-        #     })
-        # else: 
-        #     return render(request, "auctions/create_listing.html",{
-        #         'form': form,
-        #         'submitted': False
-        #     })
+
 
     # present form to be filled in
     elif (request.method == "GET" and request.user.is_authenticated):
@@ -114,30 +104,33 @@ def listing(request,listing_id):
     try:
         listing = Listing.objects.get(id=listing_id)
 
+        bid_error = request.session.pop('bid_error', None)
+
         context = {
             'listing': listing,
             'bids': listing.bids.all(),
             'comments': listing.comments.all(),
             'comment_form': comment_form(request, listing),
             'bid_form': bid_form(request, listing),
+            'bid_error': bid_error,
             'wishlist_form_name': wishlist_form(request, listing)[1],
             'wishlist_form_text': wishlist_form(request, listing)[0],
             'listing_closed': close_auction(request, listing)[0],
             'auction_winner': close_auction(request, listing)[1]
         }
-        #
-
-        # when nothing is posted
-        if not request.method=="POST":
+        
+        # when nothing is get
+        if request.method=="GET":
             return render(request, "auctions/listing.html", context)
 
-        return HttpResponseRedirect(reverse('listing', kwargs={'listing_id': listing_id}))
+        return redirect(reverse('listing', kwargs={'listing_id': listing_id}))
+
     
     # when listing does not exist
     except Listing.DoesNotExist:
-        return render(request, "auctions/listing.html",{
-            "listing": None,
-        })
+        return render(request, "auctions/error.html", {'message': 'Such listing does not exist'})
+
+
 
 
 def watchlist_page(request, username):
