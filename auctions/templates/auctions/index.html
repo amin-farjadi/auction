@@ -1,17 +1,19 @@
 {% extends "auctions/layout.html" %}
-{% load static %}
 
 {% block body %}
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        <div>
-            {% if listing.image %} 
-                <img src= "{{listing.image.url}}" alt="{{listing.title}}" style="max-height:300px; max-width: 300px;">
+        <div class="index">
+            {% if listing.image %}
+                <img  src="{{listing.image.url}}" alt="{{listing.title}}" >
             {% else %}
-                <img src= "/media/images/default.jpg" alt="Default Image" style="max-height:300px; max-width: 300px;">
+                <img  class="index" src= "/media/images/default.jpg" alt="Default Image"  >
             {% endif %}
-           <a href="{% url 'listing' listing.id %}">{{listing.id}}: {{ listing.title }}, {{ listing.price }}</a>
+            <p>
+                <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a><br>
+                <b>{{ listing.price }}</b>
+            </p>
         </div>
     
         {% empty %}

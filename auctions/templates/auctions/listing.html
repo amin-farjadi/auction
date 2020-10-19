@@ -2,15 +2,14 @@
 {% load crispy_forms_tags %}
 
 {% block body%}
-{% if listing %}
-<div>
+<!-- <div>
     {% if user.is_authenticated %}
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             <button type="submit" name= {{ wishlist_form_name }} value="wishlist">{{ wishlist_form_text }}</button>
         </form>        
     {% endif %}
-</div>
+</div> -->
 
 {% if user.id == listing.created_by.id and not listing.closed %}
     <div>
@@ -25,18 +24,36 @@
     </div>
 {% endif %}
 
-
-<div>
-    {% if listing.image %} 
-        <img src= "{{listing.image.url}}" alt="{{listing.title}}" style="max-height:300px; max-width: 300px;">
-    {% else %}
-        <img src= "/media/images/default.jpg" alt="Default Image" style="max-height:300px; max-width: 300px;">
-    {% endif %}
-    {{listing.id}}: {{ listing.title }}, {{ listing.price }}
+<div class=" w3-container">
+    <h2> Listing: {{ listing.title }} </h2>
 </div>
-<div>
-    Bids:
-    <ul>
+
+<div class=" w3-container">
+    <div class="w3-display-container">
+        {% if listing.image %} 
+            <img class="listing" src= "{{listing.image.url}}" alt="{{listing.title}}" class="img_listing">
+        {% else %}
+            <img class="listing" src= "/media/images/default.jpg" alt="Default Image" class="img_listing">
+        {% endif %}
+        {% if user.is_authenticated %}
+        <div class="w3-row">
+        <div class=" w3-display-topright w3-text-white" style="padding:0px 10px">
+            <form action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                <button class="w3-button w3-blue w3-round-xxlarge" type="submit" name= {{ wishlist_form_name }} value="wishlist" >{{ wishlist_form_text }}</button>
+            </form> 
+        </div>
+        {% endif %}   
+    </div>
+
+    <div>
+        <p>{{ listing.description }}</p><br>
+        <h3>£{{ listing.price }}</h3>
+    </div>
+</div>
+<div class="w3-container">
+    <h3>Bids</h3>
+    <ul class="w3-ul w3-card" style="width:15%">
         {% for bid in bids %}
             <li>{{bid.bid}}</li>
         {% empty %}
@@ -46,50 +63,56 @@
 </div>
 
 {% if not listing.closed and user.is_authenticated %}
-<div>
-    {% if bid_error is not none %}   
-        {{ bid_error }}
-    {% endif %}
-    <form action="{% url 'listing' listing.id %}" method="POST">
-        {% csrf_token %}
+    <div class="w3-container" style="margin-top: 2em; margin-bottom: 5em;">
+        {% if bid_error is not none %}
+            <span style="color: red;">{{ bid_error }}</span>
+        {% endif %}
 
-        {{ bid_form|crispy }}
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+            <div class="col-md-3">{{ bid_form|crispy }}</div>
+            </div>
 
-        <!-- {% endif %} -->
-        <button type="submit" name="add_bid" value="bid">Add</button>
-    </form>
-</div>
+            <button type="submit" name="add_bid" value="bid" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Add</button>
+        </form>
+    </div>
 {% endif %}
 
 {% if listing.closed %}
-    <h3>Auction is closed on this listing.</h3>
+    <div class="w3-container">
+        <h3>Auction is closed on this listing.</h3>
+    </div>
     {% if not auction_winner is None and user.id == auction_winner.id %}
-        <h3>You won the auction</h3>
+        <div class="w3-container">
+            <h3>You won the auction</h3>
+        </div>
     {% endif %}
 {% endif %}
-<div>
-    Comments:
-    <ul>
+
+<div class="w3-container" style="margin-bottom: 3em;">
+    <h3>Comments</h3>
+    <div>
         {% for comment in comments %}
+        <ul class="w3-ul w3-grey">
             <li>{{comment.comment}}</li>
+        </ul>
         {% empty %}
-            <li>No comment</li>
+            <p><b>No comment.</b></p>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 
 {% if user.is_authenticated %}
-<div>
-    <form action="{% url 'listing' listing.id %}" method="POST">
-        {% csrf_token %}
-        {{comment_form}}
-        <button type="submit" name="add_comment" value="comment">Add</button>
-    </form>
-</div>
-
-{% else %}
-    <h3>No listing with that ID.</h3>
-
+    <div class="w3-container">
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-9">{{ comment_form|crispy }}</div>
+                </div>
+            <button type="submit" name="add_comment" value="comment" class="w3-button w3-blue w3-padding-medium w3-medium w3-round-large">Add</button>
+        </form>
+    </div>
 {% endif %}
 
 {% endblock %}

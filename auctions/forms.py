@@ -96,9 +96,9 @@ def wishlist_form(request, listing):
 
     else:
         if not listing.interested_users.filter(username = request.user.username):
-            return "Add to wishlist", "add_wishlist"
+            return "+ Add to watchlist", "add_wishlist"
         else:
-            return "Remove from wishlist", "rm_wishlist"
+            return "- Remove from watchlist", "rm_wishlist"
 
 
 def close_auction(request, listing):

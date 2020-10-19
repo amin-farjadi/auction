@@ -10,7 +10,7 @@
         <form action="{% url 'create_listing' %}" method="post">
             {% csrf_token %}
             {{ form|crispy }}
-                <button type="submit">Publish</button>
+                <button class="btn btn-success" type="submit">Publish</button>
         </form>
     {% endif %}  
 {% endblock %}
