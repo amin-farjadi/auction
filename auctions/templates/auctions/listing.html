@@ -1,4 +1,5 @@
 {% extends "auctions/layout.html" %}
+{% load crispy_forms_tags %}
 
 {% block body%}
 {% if listing %}
@@ -52,7 +53,7 @@
     <form action="{% url 'listing' listing.id %}" method="POST">
         {% csrf_token %}
 
-        {{bid_form.as_p}}
+        {{ bid_form|crispy }}
 
         <!-- {% endif %} -->
         <button type="submit" name="add_bid" value="bid">Add</button>
