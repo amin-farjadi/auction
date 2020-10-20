@@ -20,7 +20,7 @@
 <!-- Winner announcement -->
 {% if not auction_winner is None and user.id == auction_winner.id %}
     <div class="w3-container">
-        <h4 style="color: green;font-weight:bold;">You won the auction!</h4>
+        <h4 style="color: green;font-weight:bold;">Congratulations, you won the auction!</h4>
     </div>
 {% endif %}
 
@@ -34,7 +34,7 @@
             <img class="listing" src= "/media/images/default.jpg" alt="Default Image" class="img_listing">
         {% endif %}
         {% if user.is_authenticated %}
-        <div id="watchlist_btn" class=" w3-display-topright w3-text-white w3-hide-small" style="padding:0px 10px; ">
+        <div id="watchlist_btn" class=" w3-display-topright w3-text-white w3-mobile" style="padding:0px 10px; ">
             <form action="{% url 'listing' listing.id %}" method="POST">
                 {% csrf_token %}
                 <button class="w3-button w3-blue w3-round-xxlarge" type="submit" name= {{ wishlist_form_name }} value="wishlist" >{{ wishlist_form_text }}</button>
@@ -42,19 +42,24 @@
         </div>
         {% endif %}   
     </div>
-
+    <div class="w3-panel w3-border w3-round-xlarge" style="padding:1%">
+        <p>Description:<br>
+        {{ listing.description }}</p>
+    </div>
     <div style="margin-bottom: 2em;">
-        <p>{{ listing.description }}</p><br>
         <h2>£{{ listing.price }}</h2>
     </div>
     <div>
         <h3>Details:</h3>
         <ul>
-            <li>Listed by: <span style="color:skyblue;">{{listing.created_by}}</span></li>
-            <li>{{listing.interested_users.count }} interested user(s)</li>
+            <li>Listed by: <span style="color:blue;">{{listing.created_by}}</span></li>
+            <li><b>{{listing.interested_users.count }}</b> interested user(s)</li>
             {% if not listing.bids.first is None%}
                 <li>Max bid: <b>£{{listing.bids.first}}</b></li>
+            {% else %}
+                <li>No bids placed</li>
             {%endif%}
+            <li>Created on: {{listing.date_time}}</li>
         </ul>
     </div>
     <div>
@@ -84,7 +89,7 @@
             <div class="col-md-3">{{ bid_form|crispy }}</div>
             </div>
 
-            <button type="submit" name="add_bid" value="bid" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Add</button>
+            <button type="submit" name="add_bid" value="bid" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Place Bid</button>
         </form>
     </div>
 {% endif %}
@@ -97,43 +102,41 @@
             <div class="row">
                 <div class="col-md-9">{{ comment_form|crispy }}</div>
                 </div>
-            <button type="submit" name="add_comment" value="comment" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Add</button>
+            <button type="submit" name="add_comment" value="comment" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Add Comment</button>
         </form>
     </div>
 {% endif %}
 
 <!-- Viewing bids -->
 <div class="w3-container" style="margin-bottom: 1em;">
-    {% if not bids is None %}
-        <button class="w3-button w3-large w3-blue-grey" onclick="document.getElementById('id01').style.display='block'" >Show Bids</button>
-        <div id="id01" class="w3-panel w3-light-gray w3-display-container" style="display:none; width: 20%;">
-            <span onclick="this.parentElement.style.display='none'"
-            class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
-            {% for bid in bids %}
-                <p>{{bid.bid}}</p>
-            {%endfor%}
-        </div>
-    {%else%}
-        <p>No bid</p>
-    {%endif%}
+    <button class="w3-button w3-large w3-blue-grey" onclick="document.getElementById('id01').style.display='block'" >Show Bids</button>
+    <div id="id01" class="w3-panel w3-light-gray w3-display-container" style="display:none; width: 20%;">
+        <span onclick="this.parentElement.style.display='none'"
+        class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
+        {% for bid in bids %}
+            <p>{{bid.bid}}</p>
+        {% empty %}
+            <p>No bids.</p>
+        {%endfor%}
+    </div>
 </div>
 
 <!-- Viewing comments -->
 <div class="w3-container" >
-    {% if not comments is None %}
-        <button class="w3-button w3-large w3-blue" onclick="document.getElementById('id02').style.display='block'" style="margin-bottom: 2em;">Show Comments</button>
-        <div id="id02" class="w3-display-container" style="display:none; width: 65%;">
-            <span onclick="this.parentElement.style.display='none'"
-            class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
-            {% for comment in comments %}
+    <button class="w3-button w3-large w3-blue" onclick="document.getElementById('id02').style.display='block'" style="margin-bottom: 2em;">Show Comments</button>
+    <div id="id02" class="w3-display-container" style="display:none; width: 65%;">
+        <span onclick="this.parentElement.style.display='none'"
+        class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
+        {% for comment in comments %}
             <div class="w3-panel w3-border-left w3-border-blue">
                 <p>{{comment.comment}}</p>
             </div>
-            {%endfor%}
-        </div>
-    {%else%}
-        <p>No comment</p>
-    {%endif%}
+        {% empty %}
+            <div class="w3-panel w3-border-left w3-border-blue">
+                <p>No comments have been added.</p>
+            </div>
+        {%endfor%}
+    </div>
 </div>
 
 

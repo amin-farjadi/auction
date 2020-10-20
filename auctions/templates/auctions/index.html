@@ -1,15 +1,18 @@
 {% extends "auctions/layout.html" %}
 {%block title %} Active Listings {% endblock %}
 {% block body %}
+<div class="w3-container">
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
         <div class="index">
-            {% if listing.image %}
-                <img  src="{{listing.image.url}}" alt="{{listing.title}}" >
-            {% else %}
-                <img  class="index" src= "/media/images/default.jpg" alt="Default Image"  >
-            {% endif %}
+            <a href="{% url 'listing' listing.id %}">
+                {% if listing.image %}
+                    <img  src="{{listing.image.url}}" alt="{{listing.title}}" >
+                {% else %}
+                    <img  class="index" src= "/media/images/default.jpg" alt="Default Image"  >
+                {% endif %}
+            </a>
             <span>
                 <a href="{% url 'listing' listing.id %}"><span style="font-size: xx-large;">{{ listing.title }}</span></a><br>
                 <b>£{{ listing.price }}</b><br>
@@ -21,6 +24,6 @@
             <h3>No listings available.</h3>
 
     {% endfor %}
-
+</div>
     
 {% endblock %}
