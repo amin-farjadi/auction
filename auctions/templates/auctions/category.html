@@ -2,14 +2,14 @@
 {%block title %} {{category}} {% endblock %}
 {% block body %}
 <div class="w3-container">
-    <h3>Listings:</h3>
+    <h3>Active Listings:</h3>
         <ul>
             {% for listing in listings %}
                 <li>
                     <a href="{% url 'listing' listing.id %}">{{listing.title}}</a>
                 </li>
             {% empty %}
-                <h3>No listing in this category</h3>
+                <h3>No active listing in this category</h3>
             {% endfor %}
         </ul>
 </div>

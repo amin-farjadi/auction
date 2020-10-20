@@ -143,11 +143,11 @@ def categories(request):
 
 
 def category(request, category):
-    listings = Listing.objects.filter(category=category)
+    listings = Listing.objects.filter(category=category, closed=False)
     if listings.count() != 0: 
         return render(request, "auctions/category.html",{
         'listings': listings,
         'category': category
         })
     else:
-        return HttpResponse('This category does not exist')
+        return render(request, "auctions/error.html", {'message': 'No active listing under this category'})

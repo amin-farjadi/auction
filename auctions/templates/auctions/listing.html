@@ -63,12 +63,13 @@
         </ul>
     </div>
     <div>
-        <h5>Categories:</h5>
-        {% if not listing.categories.all is None %}
+        <h5>Category:</h5>
+        {% if listing.category %}
             <div class="w3-bar">
-            {% for category in listing.categories.all %}
-                    <button class="w3-bar-item w3-button w3-small w3-padding-small w3-teal w3-border w3-hover-teal">{{category}}</button>
-            {% endfor %}
+                <form action="{% url 'category' listing.category %}" method="POST">
+                    {% csrf_token %}
+                    <button class="w3-bar-item w3-button w3-small w3-padding-small w3-teal w3-border w3-hover-teal">{{listing.category}}</button>
+                </form>
             </div>
         {% else %}
             None.

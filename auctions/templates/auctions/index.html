@@ -16,6 +16,7 @@
             <span>
                 <a href="{% url 'listing' listing.id %}"><span style="font-size: xx-large;">{{ listing.title }}</span></a><br>
                 <b>£{{ listing.price }}</b><br>
+                <span>{{listing.description}}</span><br>
                 <span style="margin-top: 2em; font-size: small; color: darkgray;">Created on {{ listing.date_time }}</span>
             </span>
         </div>
