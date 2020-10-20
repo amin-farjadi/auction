@@ -76,19 +76,19 @@ def create_listing(request):
     if request.method == "POST":
         form = CreateListing(request.POST, request.FILES)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.created_by = request.user
-            instance.save()
+            form = form.save(commit=False)
+            form.created_by = request.user
+            form.save()
             return redirect(reverse('index'))
 
-        request.session['form_info'] = request.POST
+        request.session['form_info'] = request.POST, request.FILES
         return redirect(reverse('create_listing'))
 
     # load page (with form error)
     else:
         form_info = request.session.pop('form_info', None)
         if form_info is None: form = CreateListing()
-        else: form = CreateListing(form_info)
+        else: form = CreateListing(form_info[0], form_info[1])
 
         return render(request, "auctions/create_listing.html", {'form': form})
 
