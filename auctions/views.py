@@ -152,7 +152,8 @@ def category(request, category):
     try:
      category = Category.objects.get(category=category)
      return render(request, "auctions/category.html",{
-        'listings': category.listings.all()
+        'listings': category.listings.all(),
+        'category': category
      })
 
     except Category.DoesNotExist:

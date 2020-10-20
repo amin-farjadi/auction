@@ -1,5 +1,6 @@
 body {
     padding: 20px;
+    background-color: slategray;
 }
 
 .w3-bar a {font-family: "Roboto", sans-serif}
@@ -22,10 +23,10 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     border: none;
 }
 
-.index p{
+.index span{
     display: inline-block;
     vertical-align: top;
-    margin-top: 3em
+    margin-top: 5%;
 }
 
 
@@ -37,4 +38,10 @@ body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
     margin-bottom: 5%;
     width: 50%;
   }
-/* style="" */
+
+
+@media screen and (max-width: 600px) {
+    img.w3-container img.listing img.index {
+      width: 100% !important;
+    }
+}

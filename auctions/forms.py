@@ -51,7 +51,8 @@ class AddBid(forms.ModelForm):
 
     def clean(self):
         bid = self.cleaned_data.get('bid')
-        if bid <= self.min_bid:
+        if bid is None: pass
+        elif bid <= self.min_bid:
             self.add_error('bid', 'Bid must be higher than {:.2f}'.format(self.min_bid))
 
 
@@ -62,6 +63,7 @@ def bid_form(request,listing):
         if listing.bids.exists():
             max_bid = listing.bids.all().aggregate(models.Max('bid'))
             max_bid = max(listing.price, max_bid['bid__max'])
+            #request.session['max_bid'] = float(max_bid)
         else:
             max_bid = listing.price
 

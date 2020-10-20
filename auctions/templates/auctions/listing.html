@@ -1,34 +1,32 @@
 {% extends "auctions/layout.html" %}
 {% load crispy_forms_tags %}
-
+{%block title %} Listing: {{ listing.title }} {% endblock %}
 {% block body%}
-<!-- <div>
-    {% if user.is_authenticated %}
-        <form action="{% url 'listing' listing.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" name= {{ wishlist_form_name }} value="wishlist">{{ wishlist_form_text }}</button>
-        </form>        
-    {% endif %}
-</div> -->
 
+<!-- Listing closing -->
 {% if user.id == listing.created_by.id and not listing.closed %}
-    <div>
+    <div class="w3-container">
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
-            <button type="submit" name="close_listing" value="">Close listing</button>
+            <button class="w3-button w3-red" type="submit" name="close_listing" value="">Close listing</button>
         </form>
     </div>
-    {% elif listing.closed %}
+{% elif listing.closed %}
     <div>    
-        <h4>Listing is closed</h4>
+        <h4 style="color: red;">Listing is closed</h4>
     </div>
 {% endif %}
 
+<!-- Winner announcement -->
+{% if not auction_winner is None and user.id == auction_winner.id %}
+    <div class="w3-container">
+        <h4 style="color: green;">You won the auction!</h4>
+    </div>
+{% endif %}
+
+<!-- Listing title, image and details -->
 <div class=" w3-container">
     <h2> Listing: {{ listing.title }} </h2>
-</div>
-
-<div class=" w3-container">
     <div class="w3-display-container">
         {% if listing.image %} 
             <img class="listing" src= "{{listing.image.url}}" alt="{{listing.title}}" class="img_listing">
@@ -36,8 +34,7 @@
             <img class="listing" src= "/media/images/default.jpg" alt="Default Image" class="img_listing">
         {% endif %}
         {% if user.is_authenticated %}
-        <div class="w3-row">
-        <div class=" w3-display-topright w3-text-white" style="padding:0px 10px">
+        <div id="watchlist_btn" class=" w3-display-topright w3-text-white w3-hide-small" style="padding:0px 10px; ">
             <form action="{% url 'listing' listing.id %}" method="POST">
                 {% csrf_token %}
                 <button class="w3-button w3-blue w3-round-xxlarge" type="submit" name= {{ wishlist_form_name }} value="wishlist" >{{ wishlist_form_text }}</button>
@@ -46,24 +43,37 @@
         {% endif %}   
     </div>
 
-    <div>
+    <div style="margin-bottom: 2em;">
         <p>{{ listing.description }}</p><br>
-        <h3>£{{ listing.price }}</h3>
+        <h2>£{{ listing.price }}</h2>
+    </div>
+    <div>
+        <h3>Details:</h3>
+        <ul>
+            <li>Listed by: <span style="color:skyblue;">{{listing.created_by}}</span></li>
+            <li>{{listing.interested_users.count }} interested user(s)</li>
+            {% if not listing.bids.first is None%}
+                <li>Max bid: £{{listing.bids.first}}</li>
+            {%endif%}
+        </ul>
+    </div>
+    <div>
+        <h5>Categories:</h5>
+        {% if not listing.categories.all is None %}
+            <div class="w3-bar">
+            {% for category in listing.categories.all %}
+                    <button class="w3-bar-item w3-button w3-small w3-padding-small w3-teal w3-border w3-hover-teal">{{category}}</button>
+            {% endfor %}
+            </div>
+        {% else %}
+            None.
+        {% endif %}
     </div>
 </div>
-<div class="w3-container">
-    <h3>Bids</h3>
-    <ul class="w3-ul w3-card" style="width:15%">
-        {% for bid in bids %}
-            <li>{{bid.bid}}</li>
-        {% empty %}
-            <li>No bid.</li>
-        {% endfor %}
-    </ul>
-</div>
 
+<!-- Adding bid -->
 {% if not listing.closed and user.is_authenticated %}
-    <div class="w3-container" style="margin-top: 2em; margin-bottom: 5em;">
+    <div class="w3-container" style="margin-top: 2em; margin-bottom: 1.5em;">
         {% if bid_error is not none %}
             <span style="color: red;">{{ bid_error }}</span>
         {% endif %}
@@ -79,40 +89,52 @@
     </div>
 {% endif %}
 
-{% if listing.closed %}
-    <div class="w3-container">
-        <h3>Auction is closed on this listing.</h3>
-    </div>
-    {% if not auction_winner is None and user.id == auction_winner.id %}
-        <div class="w3-container">
-            <h3>You won the auction</h3>
-        </div>
-    {% endif %}
-{% endif %}
-
-<div class="w3-container" style="margin-bottom: 3em;">
-    <h3>Comments</h3>
-    <div>
-        {% for comment in comments %}
-        <ul class="w3-ul w3-grey">
-            <li>{{comment.comment}}</li>
-        </ul>
-        {% empty %}
-            <p><b>No comment.</b></p>
-        {% endfor %}
-    </div>
-</div>
-
+<!-- Adding comment -->
 {% if user.is_authenticated %}
-    <div class="w3-container">
+    <div class="w3-container" style="margin-bottom: 3em;">
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-9">{{ comment_form|crispy }}</div>
                 </div>
-            <button type="submit" name="add_comment" value="comment" class="w3-button w3-blue w3-padding-medium w3-medium w3-round-large">Add</button>
+            <button type="submit" name="add_comment" value="comment" class="w3-button w3-green w3-padding-medium w3-medium w3-round-large">Add</button>
         </form>
     </div>
 {% endif %}
+
+<!-- Viewing bids -->
+<div class="w3-container" style="margin-bottom: 1em;">
+    {% if not bids is None %}
+        <button class="w3-button w3-large w3-blue-grey" onclick="document.getElementById('id01').style.display='block'" >Show Bids</button>
+        <div id="id01" class="w3-panel w3-light-gray w3-display-container" style="display:none; width: 20%;">
+            <span onclick="this.parentElement.style.display='none'"
+            class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
+            {% for bid in bids %}
+                <p>{{bid.bid}}</p>
+            {%endfor%}
+        </div>
+    {%else%}
+        <p>No bid</p>
+    {%endif%}
+</div>
+
+<!-- Viewing comments -->
+<div class="w3-container" >
+    {% if not comments is None %}
+        <button class="w3-button w3-large w3-blue" onclick="document.getElementById('id02').style.display='block'" style="margin-bottom: 2em;">Show Comments</button>
+        <div id="id02" class="w3-display-container" style="display:none; width: 65%;">
+            <span onclick="this.parentElement.style.display='none'"
+            class="w3-button w3-small w3-padding-small w3-red w3-display-topright">x</span>
+            {% for comment in comments %}
+            <div class="w3-panel w3-border-left w3-border-blue">
+                <p>{{comment.comment}}</p>
+            </div>
+            {%endfor%}
+        </div>
+    {%else%}
+        <p>No comment</p>
+    {%endif%}
+</div>
+
 
 {% endblock %}

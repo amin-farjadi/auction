@@ -1,5 +1,5 @@
 {% extends "auctions/layout.html" %}
-
+{%block title %} Active Listings {% endblock %}
 {% block body %}
     <h2>Active Listings</h2>
 
@@ -10,10 +10,11 @@
             {% else %}
                 <img  class="index" src= "/media/images/default.jpg" alt="Default Image"  >
             {% endif %}
-            <p>
-                <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a><br>
-                <b>{{ listing.price }}</b>
-            </p>
+            <span>
+                <a href="{% url 'listing' listing.id %}"><span style="font-size: xx-large;">{{ listing.title }}</span></a><br>
+                <b>£{{ listing.price }}</b><br>
+                <span style="margin-top: 2em; font-size: small; color: darkgray;">Created on {{ listing.date_time }}</span>
+            </span>
         </div>
     
         {% empty %}
