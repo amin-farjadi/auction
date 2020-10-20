@@ -9,7 +9,6 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .forms import *
-from django.contrib import messages
 
 def index(request):
     return render(request, "auctions/index.html",{
@@ -139,17 +138,16 @@ def watchlist_page(request, username):
 
 def categories(request):
     return render(request, "auctions/categories.html",{
-        'categories': Category.objects.all()
+        'categories': Listing.objects.order_by('category').values('category').distinct()
     })
 
 
 def category(request, category):
-    try:
-     category = Category.objects.get(category=category)
-     return render(request, "auctions/category.html",{
-        'listings': category.listings.all(),
+    listings = Listing.objects.filter(category=category)
+    if listings.count() != 0: 
+        return render(request, "auctions/category.html",{
+        'listings': listings,
         'category': category
-     })
-
-    except Category.DoesNotExist:
+        })
+    else:
         return HttpResponse('This category does not exist')

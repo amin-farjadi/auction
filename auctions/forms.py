@@ -1,5 +1,5 @@
 from django.forms import widgets
-from .models import Bid, Comment, User, Listing, Category
+from .models import Bid, Comment, User, Listing
 from django import forms
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -13,7 +13,7 @@ class CreateListing(forms.ModelForm):
     """Form for Listing model"""
     class Meta:
         model = Listing
-        fields = ['title', 'price', 'description', 'image']
+        fields = ['title', 'price', 'description', 'category', 'image']
 
 
 

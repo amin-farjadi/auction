@@ -12,6 +12,12 @@ class User(AbstractUser):
     pass
 
 price_max_digits=10
+CATEGORY_CHOICES = [
+    ('Electronics','Electronics'),
+    ('Toys','Toys'),
+    ('Fashion','Fashion'),
+    ('Others','Others')
+]
 
 class Listing(models.Model):
     # picture
@@ -34,6 +40,8 @@ class Listing(models.Model):
     created_by = models.ForeignKey(User, on_delete=CASCADE, related_name="listings")
     # listing closed parameter
     closed = models.BooleanField(default=False)
+    # category
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True, null=True)
     # object title
     def __str__(self):
         return f"{self.id}: {self.title}"
@@ -72,16 +80,3 @@ class Comment(models.Model):
     # object name
     def __str__(self) -> str:
         return f"{self.id}: comment on {self.listing}"
-
-
-CATEGORY_CHOICES = [
-    ('Electronics','Electronics'),
-    ('Toys','Toys'),
-    ('Fashion','Fashion')
-]
-
-class Category(models.Model):
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
-    listings = models.ManyToManyField(Listing, blank=True, related_name="categories")
-    def __str__(self):
-        return f"{self.category}"
