@@ -69,33 +69,28 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
-#@login_required(login_url="/login")
+@login_required(login_url="/login")
 def create_listing(request):
+    
     # create listing and redirect to index
-    if request.method == "POST" and request.user.is_authenticated:
+    if request.method == "POST":
         form = CreateListing(request.POST, request.FILES)
         if form.is_valid():
-            form = form.save(commit=False)
-            form.created_by = request.user
-            form.save()
-            return render(request, "auctions/create_listing.html",{
-                'form': form,
-                'submitted': True
-            })
+            instance = form.save(commit=False)
+            instance.created_by = request.user
+            instance.save()
+            return redirect(reverse('index'))
 
+        request.session['form_info'] = request.POST
+        return redirect(reverse('create_listing'))
 
-    # present form to be filled in
-    elif (request.method == "GET" and request.user.is_authenticated):
-        form = CreateListing()
-        return render(request, "auctions/create_listing.html",{
-            'form': form,
-            'submitted': False
-        })
-    
+    # load page (with form error)
     else:
-        return render(request, "auctions/login.html",{
-            "message": "You must be logged in to create a listing."
-        })
+        form_info = request.session.pop('form_info', None)
+        if form_info is None: form = CreateListing()
+        else: form = CreateListing(form_info)
+
+        return render(request, "auctions/create_listing.html", {'form': form})
 
 
 def listing(request,listing_id):

@@ -10,13 +10,17 @@ from decimal import Decimal
 
 # Form for creating a listing
 class CreateListing(forms.ModelForm):
-    """Form for Listing model
-    Args:
-        
-    """
+    """Form for Listing model"""
     class Meta:
         model = Listing
         fields = ['title', 'price', 'description', 'image']
+
+    # def clean(self):
+    #     super().clean()
+    #     price = self.cleaned_data.get('price')
+    #     if price < 0.01:
+    #         self.add_error('price','Invalid price')
+
 
 
 # Form for adding comment

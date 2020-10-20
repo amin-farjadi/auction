@@ -12,20 +12,20 @@
         </form>
     </div>
 {% elif listing.closed %}
-    <div>    
-        <h4 style="color: red;">Listing is closed</h4>
+    <div class="w3-container">    
+        <h4 style="color: red; font-weight:1000;">Listing is closed</h4>
     </div>
 {% endif %}
 
 <!-- Winner announcement -->
 {% if not auction_winner is None and user.id == auction_winner.id %}
     <div class="w3-container">
-        <h4 style="color: green;">You won the auction!</h4>
+        <h4 style="color: green;font-weight:bold;">You won the auction!</h4>
     </div>
 {% endif %}
 
 <!-- Listing title, image and details -->
-<div class=" w3-container">
+<div class=" w3-container" style="margin-bottom: 2em;">
     <h2> Listing: {{ listing.title }} </h2>
     <div class="w3-display-container">
         {% if listing.image %} 
@@ -53,7 +53,7 @@
             <li>Listed by: <span style="color:skyblue;">{{listing.created_by}}</span></li>
             <li>{{listing.interested_users.count }} interested user(s)</li>
             {% if not listing.bids.first is None%}
-                <li>Max bid: £{{listing.bids.first}}</li>
+                <li>Max bid: <b>£{{listing.bids.first}}</b></li>
             {%endif%}
         </ul>
     </div>
@@ -73,7 +73,7 @@
 
 <!-- Adding bid -->
 {% if not listing.closed and user.is_authenticated %}
-    <div class="w3-container" style="margin-top: 2em; margin-bottom: 1.5em;">
+    <div class="w3-container" style="margin-bottom: 3em;">
         {% if bid_error is not none %}
             <span style="color: red;">{{ bid_error }}</span>
         {% endif %}
